@@ -273,5 +273,5 @@ class Auth {
   }
 }
 
-// AXION PATTERN: Export class, NOT instance
+//  Export class, NOT instance
 module.exports = Auth;
