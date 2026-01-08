@@ -13,9 +13,22 @@ const userSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(config.bcrypt.rounds);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
 
+userSchema.methods.comparePassword = async function(pwd) {
+  return await bcrypt.compare(pwd, this.password);
+};
 
-
+userSchema.methods.toJSON = function() {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 
 userSchema.index({ email: 1 });
 userSchema.index({ role: 1, schoolId: 1 });

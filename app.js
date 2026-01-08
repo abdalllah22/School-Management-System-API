@@ -37,6 +37,10 @@ app.use('/api', rateLimiter);
 // ROUTES - AXION STYLE
 // ============================================
 
+const authRoutes = require('./managers/auth/auth.routes');
+
+
+app.use('/api/v1/auth', authRoutes);
 
 
 // ============================================
