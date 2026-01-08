@@ -1,5 +1,5 @@
 /**
- * Student Routes - TRUE AXION PATTERN
+ * Student Routes 
  * Uses cortex.executeManager() to execute StudentManager methods
  */
 

@@ -1,5 +1,5 @@
 /**
- * Student Manager - TRUE AXION PATTERN
+ * Student Manager 
  * Pure business logic class for student management
  * Handles enrollment, transfers, and student lifecycle
  */
