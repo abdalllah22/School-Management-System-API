@@ -88,6 +88,8 @@ classroomSchema.pre('save', function(next) {
 });
 
 // Student.js Model
+const { nanoid } = require('nanoid');
+
 const studentSchema = new mongoose.Schema({
   schoolId: { type: mongoose.Schema.Types.ObjectId, ref: 'School', required: true },
   classroomId: { type: mongoose.Schema.Types.ObjectId, ref: 'Classroom', required: true },
@@ -131,7 +133,11 @@ studentSchema.index({ studentId: 1 }, { unique: true });
 studentSchema.index({ schoolId: 1, status: 1 });
 studentSchema.index({ classroomId: 1, status: 1 });
 
-
+studentSchema.pre('save', async function(next) {
+  if (!this.isNew || this.studentId) return next();
+  this.studentId = `STU${nanoid(10)}`;
+  next();
+});
 
 // Export all models
 module.exports = {
