@@ -268,7 +268,7 @@ Authorization: Bearer <token>
 ```
 
 
-### School Endpoints (Superadmin Only)
+### 🏫 School Endpoints (Superadmin Only)
 #### Create School
 ```bash
 POST /schools
@@ -307,7 +307,7 @@ Authorization: Bearer <token>
 
 
 
-### Classroom Endpoints (School Admin)
+### 📚 Classroom Endpoints (School Admin)
 
 #### Create Classroom
 ```bash
@@ -336,7 +336,7 @@ Authorization: Bearer <token>
 ```
 
 
-### Student Endpoints (School Admin)
+### 👨🏻‍🎓Student Endpoints (School Admin)
 
 #### Enroll Student
 ```bash
@@ -434,18 +434,15 @@ npm run test:watch
 This project uses GitHub Actions to automatically deploy to the production server whenever changes are pushed to the main branch.
 
 flowchart TD
-    A[Developer] -->|Push / Merge to main| B[GitHub Repository]
-
+    
+    A  [Developer] |Push / Merge to main| B[GitHub Repository]
     B -->|Triggers| C[GitHub Actions<br/>Deploy to Production]
-
     C -->|SSH using Secrets| D[Production Server<br/>DigitalOcean Droplet]
-
     D --> E[Pull Latest Code<br/>main branch]
     E --> F[Update .env from<br/>GitHub Secrets]
     F --> G[npm install]
     G --> H[npm run build]
     H --> I[PM2 Restart / Start App]
-
     I --> J[🚀 Application Live]
 
 
