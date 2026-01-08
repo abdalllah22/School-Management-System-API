@@ -80,7 +80,12 @@ const classroomSchema = new mongoose.Schema({
 classroomSchema.index({ schoolId: 1, isActive: 1 });
 classroomSchema.index({ schoolId: 1, grade: 1, section: 1 });
 
-
+classroomSchema.pre('save', function(next) {
+  if (this.currentEnrollment > this.capacity) {
+    return next(new Error('Current enrollment cannot exceed capacity'));
+  }
+  next();
+});
 
 // Student.js Model
 const studentSchema = new mongoose.Schema({

@@ -38,7 +38,12 @@ app.use('/api', rateLimiter);
 // ============================================
 
 const authRoutes = require('./managers/auth/auth.routes');
+const schoolRoutes = require('./managers/school/school.routes');
+const classroomRoutes = require('./managers/classroom/classroom.routes');
 
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/schools', schoolRoutes);
+app.use('/api/v1/classrooms', classroomRoutes);
 
 app.use('/api/v1/auth', authRoutes);
 
