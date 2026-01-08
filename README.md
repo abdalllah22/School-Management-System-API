@@ -336,7 +336,7 @@ Authorization: Bearer <token>
 ```
 
 
-### 👨🏻‍🎓Student Endpoints (School Admin)
+### 👨🏻‍🎓 Student Endpoints (School Admin)
 
 #### Enroll Student
 ```bash
@@ -436,10 +436,10 @@ This project uses GitHub Actions to automatically deploy to the production serve
 flowchart TD
     
     A  [Developer] |Push / Merge to main| B[GitHub Repository]
-    B -->|Triggers| C[GitHub Actions<br/>Deploy to Production]
-    C -->|SSH using Secrets| D[Production Server<br/>DigitalOcean Droplet]
-    D --> E[Pull Latest Code<br/>main branch]
-    E --> F[Update .env from<br/>GitHub Secrets]
+    B -->|Triggers| C[GitHub Actions Deploy to Production]
+    C -->|SSH using Secrets| D[Production Server DigitalOcean Droplet]
+    D --> E[Pull Latest Code main branch]
+    E --> F[Update .env from GitHub Secrets]
     F --> G[npm install]
     G --> H[npm run build]
     H --> I[PM2 Restart / Start App]

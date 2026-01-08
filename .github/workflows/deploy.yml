@@ -1,0 +1,111 @@
+name: Deploy School Management API to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: 
+
+jobs:
+  deploy:
+    name: Deploy to DigitalOcean
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH Key
+        run: |
+          echo "${{ secrets.DROPLET_PRIVATE_KEY }}" > github-droplet-key.pem
+          chmod 600 github-droplet-key.pem
+
+      - name: Clone or Update Repository
+        run: |
+          ssh -o StrictHostKeyChecking=no -i github-droplet-key.pem \
+          ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+            REPO_URL="https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git"
+            BRANCH="main"
+            REPO_DIR="/var/www/school-management-api"
+
+            mkdir -p "$REPO_DIR"
+
+            if [ -d "$REPO_DIR/.git" ]; then
+              echo "Updating repository..."
+              cd "$REPO_DIR"
+              git fetch origin "$BRANCH"
+              git reset --hard origin/"$BRANCH"
+            else
+              echo "Cloning repository..."
+              git clone "$REPO_URL" "$REPO_DIR"
+              cd "$REPO_DIR"
+              git checkout "$BRANCH"
+            fi
+          '
+
+      - name: Update Environment Variables
+        run: |
+          ssh -o StrictHostKeyChecking=no -i github-droplet-key.pem \
+          ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+          cat > /var/www/school-management-api/.env << EOL
+          NODE_ENV=${{ secrets.NODE_ENV }}
+          PORT=${{ secrets.PORT }}
+
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+          JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+          JWT_REFRESH_EXPIRES_IN=${{ secrets.JWT_REFRESH_EXPIRES_IN }}
+
+          BCRYPT_ROUNDS=${{ secrets.BCRYPT_ROUNDS }}
+
+          RATE_LIMIT_WINDOW_MS=${{ secrets.RATE_LIMIT_WINDOW_MS }}
+          RATE_LIMIT_MAX_REQUESTS=${{ secrets.RATE_LIMIT_MAX_REQUESTS }}
+
+          AUTH_RATE_LIMIT_WINDOW_MS=${{ secrets.AUTH_RATE_LIMIT_WINDOW_MS }}
+          AUTH_RATE_LIMIT_MAX_REQUESTS=${{ secrets.AUTH_RATE_LIMIT_MAX_REQUESTS }}
+
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          EOL
+          '
+
+      - name: Install Dependencies
+        run: |
+          ssh -o StrictHostKeyChecking=no -i github-droplet-key.pem \
+          ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+            cd /var/www/school-management-api
+            npm ci --production
+          '
+
+      - name: Restart Application with PM2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i github-droplet-key.pem \
+          ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+            cd /var/www/school-management-api
+
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+
+            pm2 restart school-management-api --update-env \
+              || pm2 start index.js --name "school-management-api" --max-memory-restart 1G
+
+            pm2 save
+            pm2 startup || true
+          '
+
+      - name: Health Check
+        run: |
+          ssh -o StrictHostKeyChecking=no -i github-droplet-key.pem \
+          ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }} '
+            sleep 5
+            pm2 list | grep school-management-api
+            curl -f http://localhost:${{ secrets.PORT }}/health
+            echo "✅ Application is healthy!"
+          '
+
+      - name: Cleanup
+        if: always()
+        run: rm -f github-droplet-key.pem
