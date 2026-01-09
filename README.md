@@ -419,12 +419,36 @@ See models in `loaders/index.js` for detailed schemas.
 
 ## 🧪 Testing
 
-```bash
-# Run all tests
-npm test
+## Test Structure
 
-# Run in watch mode
+```
+tests/
+├── setup.js                        
+├── helpers/
+│   └── factories.js                
+└── unit/
+    ├── auth.manager.test.js        
+    ├── school.manager.test.js      
+    ├── classroom.manager.test.js   
+    └── student.manager.test.js     
+```
+
+## Running Tests
+
+### All Tests
+```bash
+npm test
+```
+
+### Watch Mode (Re-run on changes)
+```bash
 npm run test:watch
+```
+
+### With Coverage
+```bash
+npm test
+# Coverage report in: coverage/lcov-report/index.html
 ```
 
 ## 🚀 Deployment
