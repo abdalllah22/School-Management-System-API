@@ -6,11 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest --coverage --detectOpenHandles --forceExit",
-    "test:unit": "jest tests/unit --coverage",
-    "test:integration": "jest tests/integration --coverage",
+    "test": "jest --coverage --verbose",
     "test:watch": "jest --watch",
-    "test:verbose": "jest --verbose --coverage"
+    "test:unit": "jest tests/unit --coverage"
   },
   "keywords": [
     "school-management",
